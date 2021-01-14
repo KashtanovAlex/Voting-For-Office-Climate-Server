@@ -12,7 +12,7 @@ namespace ServerWindow
     class TGmodel : Program
     {
 
-        TelegramBotClient botClient = new TelegramBotClient("TG-Token. PAST here");//1424178260:AAFs2PjM10Gs-kDe4r-QJs77Pcr7AdD..
+        TelegramBotClient botClient = new TelegramBotClient("1424178260:AAFs2PjM10Gs-kDe4r-QJs77Pcr7AdDzJBc");//1424178260:AAFs2PjM10Gs-kDe4r-QJs77Pcr7AdD..
 
         public void GetMessageFromTG()
         {
