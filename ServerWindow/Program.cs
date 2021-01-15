@@ -62,15 +62,21 @@ namespace ServerWindow
 
                 int countUser = 0;
                 // Начинаем слушать соединения
-
                 var tg = new TGmodel();
                 tg.GetMessageFromTG();
                 DateTime dt = DateTime.Now;
                 string bufDate = dt.ToShortDateString();
                 var outweather = new OutWeather();
-                var outTemp = outweather.GetData();
-                Console.WriteLine("Connect to data base completed."+"\n");
-
+                var outTemp = "0";
+                try
+                {
+                    outTemp = outweather.GetData();
+                    Console.WriteLine("Соединение с базой данных успешно установленно." + "\n");
+                }
+                catch
+                {
+                    Console.WriteLine("Соединение с базой данных не установленно." + "\n");
+                }
                 while (true)
                 {
                     //получение дня и если не было проверки температаруы то проверять
@@ -79,7 +85,7 @@ namespace ServerWindow
                     {
                         outTemp = outweather.GetData();
                     }
-                    // CheckClient();
+
 
                     // Программа приостанавливается, ожидая входящее соединение
                     Socket handler = sListener.Accept();
@@ -123,7 +129,7 @@ namespace ServerWindow
                     //ClientIP.Add(Convert.ToString(clientep.Address));
                     if (outTemp.Length > 5)
                     {
-                        outTemp = outTemp.Substring(0, outTemp.Length - 12);
+                        outTemp = outTemp.Substring(0, outTemp.Length - 13);
                     }
                     Console.Write("Температура на улице: " + outTemp + "\n");
                     

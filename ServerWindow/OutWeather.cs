@@ -69,9 +69,13 @@ namespace ServerWindow
             var DBTemp = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Temperature)));
             var DBPressure = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Pressure)));
             var DBTempMin = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Temp_min)));
-
-            //var cmd = new SqlCommand("SELECT City FROM Table_Weather WHERE Temp = -50", connection);
-            var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "','20-10-2008 10:37:22','Omsk')", connection);
+            DateTime dt = DateTime.Now;
+            string DateNoFormat = dt.ToShortDateString();
+            string DateDB = DateNoFormat[0]+""+ DateNoFormat[1]+"-" + DateNoFormat[3] + "" + DateNoFormat[4] + "-" + DateNoFormat[6] + DateNoFormat[7] + DateNoFormat[8] + DateNoFormat[9];
+            //DateDB = "20-10-2008 10:37:22";
+            //var cmd = new SqlCommand("SELECT City FROM Table_Weather WHERE Temp = -50", connection);20-10-2008 10:37:22'
+            //var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "', '20-10-2008 10:37:22','Novosibirsk')", connection);
+            var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "','" + DateDB + "','Nsk')", connection);
             SqlDataReader read = cmd.ExecuteReader();
 
 
