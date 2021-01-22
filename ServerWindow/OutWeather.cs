@@ -72,7 +72,8 @@ namespace ServerWindow
             DateTime dt = DateTime.Now;
             string DateNoFormat = dt.ToShortDateString();
             string DateDB = DateNoFormat[0]+""+ DateNoFormat[1]+"-" + DateNoFormat[3] + "" + DateNoFormat[4] + "-" + DateNoFormat[6] + DateNoFormat[7] + DateNoFormat[8] + DateNoFormat[9];
-            //DateDB = "20-10-2008 10:37:22";
+            //DateDB += " 00:00:10";
+            //DateDB = "22-12-2008 10:37:22";
             //var cmd = new SqlCommand("SELECT City FROM Table_Weather WHERE Temp = -50", connection);20-10-2008 10:37:22'
             //var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "', '20-10-2008 10:37:22','Novosibirsk')", connection);
             var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "','" + DateDB + "','Nsk')", connection);
