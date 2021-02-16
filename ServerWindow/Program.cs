@@ -18,12 +18,7 @@ namespace ServerWindow
         static int ActiveUsers = 0;
         static void Main(string[] args)
         {
-            /*
-            DateTime[] arrString = new DateTime[2];
-            arrString[0] = DateTime(9,0);
-            arrString[1] = "1,00";
-            arrString[2] = "6:00";
-            */
+
 
             Console.WriteLine("Connecting...");
             // Устанавливаем для сокета локальную конечную точку
@@ -31,25 +26,11 @@ namespace ServerWindow
             IPAddress ipAddr = ipHost.AddressList[0];
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 11000);
             var average = 0;
-            var lastSum = 0;
-            var averagecounter = 2;
 
-            int[] ventTimeMass = new int[3];
+            var a = new TempInside();
+            a.Connect();
 
-            ventTimeMass[0] = 9;
-
-            ventTimeMass[1] = 1;
-
-            ventTimeMass[2] = 6;
-
-
-            //     string fstVent = "1:00";
-
-            //  var cultureInfo = new CultureInfo("de-DE");
-
-            //  var ventTime = DateTime.Parse(fstVent, cultureInfo, DateTimeStyles.NoCurrentDateDefault);
-
-            //   var z = DateTime.Now.ToString("hh:mm", CultureInfo.InvariantCulture);
+            int[] ventTimeMass = { 9, 1, 6 };// массив со временем проветривания
 
             // Создаем сокет Tcp/Ip
             Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -60,54 +41,36 @@ namespace ServerWindow
                 sListener.Bind(ipEndPoint);
                 sListener.Listen(10);
 
-                int countUser = 0;
+                var countUser = 0;
                 // Начинаем слушать соединения
                 var tg = new TGmodel();
                 tg.GetMessageFromTG();
                 DateTime dt = DateTime.Now;
                 string bufDate = dt.ToShortDateString();
                 var outweather = new OutWeather();
-                var outTemp = "0";
-                try
-                {
-                    outTemp = outweather.GetData();
-                    Console.WriteLine("Соединение с базой данных успешно установленно." + "\n");
-                }
-                catch
-                {
-                    Console.WriteLine("Соединение с базой данных не установленно." + "\n");
-                }
+                var outTemp = "0"; // переменная для хранения температуры взятой с интернета
                 while (true)
                 {
-                    //получение дня и если не было проверки температаруы то проверять
+                    //получение дня и если сегодня не было проверки температаруы то проверять
                     string curDate = dt.ToShortDateString();
-                    if (curDate == bufDate) //для првоерки работы, должно быть !=
+                    if (curDate != bufDate) //для првоерки работы, должно быть !=
                     {
                         outTemp = outweather.GetData();
                     }
-
-
                     // Программа приостанавливается, ожидая входящее соединение
                     Socket handler = sListener.Accept();
                     string data = null;
 
-                    //  var b = sListener.RemoteEndPoint.AddressFamily;
-                    //var clientAdress = ((IPEndPoint)sListener.LocalEndPoint).Address.ToString();
-
                     // Мы дождались клиента, пытающегося с нами соединиться
-
                     byte[] bytes = new byte[1024];
-                    int bytesRec = handler.Receive(bytes);
+                    var bytesRec = handler.Receive(bytes);
 
-                    data += Encoding.UTF8.GetString(bytes, 0, bytesRec);
+                    data += Encoding.UTF8.GetString(bytes, 0, bytesRec);//получение данных от клиента (от 0 до 10)
 
                     IPEndPoint clientep;
-                    //Socket client;
                     clientep = (IPEndPoint)handler.RemoteEndPoint;
-                    //string strConnect = "Connected with " + clientep.Address;
 
                     var isIPinList = _clientResponses.Any(x => x.IpAddress == Convert.ToString(clientep.Address));
-
                     var indexIp = _clientResponses.FindIndex(x => x.IpAddress == Convert.ToString(clientep.Address));
 
                     //var ipAddress = clientep.Address.ToString();
@@ -125,25 +88,20 @@ namespace ServerWindow
                         }
                     }
 
-
-                    //ClientIP.Add(Convert.ToString(clientep.Address));
                     if (outTemp.Length > 5)
                     {
                         outTemp = outTemp.Substring(0, outTemp.Length - 13);
                     }
+                    //вывод информации в консоль
                     Console.Write("Температура на улице: " + outTemp + "\n");
-                    
-                    // Показываем данные на консоли
+                    Console.WriteLine("Погода в офисе: " + a.TempInsideValue);
                     Console.Write("Полученный текст: " + data + "  от " + clientep + "\n");
-
                     Console.Write("Всего пользователей подключено: " + _clientResponses.Count + "\n");
 
                     try
                     {
                         var timeNow = DateTime.Now;
-                        //var maxDifference = TimeSpan.FromMinutes(15);
                         var maxDifference = TimeSpan.FromSeconds(30);
-
 
                         for (var i = 0; i < _clientResponses.Count; i++)
                         {
@@ -157,23 +115,11 @@ namespace ServerWindow
                         for (var i = 0; i < _clientResponses.Count; i++)
                         {
                             sum += _clientResponses[i].Temperature;
-                         
+
 
                         }
 
-                        average = sum / _clientResponses.Count;
-                        /*
-                        if (countUser != 0)
-                        {
-                            lastSum = lastSum + Convert.ToInt32(data);
-                            countUser--;
-                        }
-                        else
-                        {
-                            countUser = _clientResponses.Count;
-                            average = lastSum / _clientResponses.Count;
-                            lastSum = 0;
-                        }*/
+                        average = sum / _clientResponses.Count;//расчет среднего
                     }
                     catch
                     {
@@ -184,7 +130,7 @@ namespace ServerWindow
                     int minuteNow = DateTime.Now.Minute;
 
 
-
+                    //формирование сообщения о провертивании
                     string reply = "В " + Convert.ToString(ventTimeMass[1]) + ":00" + " будет проводиться проветривание.";
 
                     if (average < 3)
@@ -204,7 +150,7 @@ namespace ServerWindow
                         {
                             hoursNow += 12;
                         }
-                        int nearVentTime = 0;
+                        var nearVentTime = 0;
                         for (int i = 0; i < ventTimeMass.Length; i++)
                         {
                             if (ventTimeMass[i] - hoursNow >= 0)
@@ -217,7 +163,7 @@ namespace ServerWindow
                             { }
                         }
                     }
-                   // reply = "Идет проветривание, осталось: " + Convert.ToString(15 - minuteNow) + " минут";//ДЛЯ ТЕСТА
+                    // reply = "Идет проветривание, осталось: " + Convert.ToString(15 - minuteNow) + " минут";//ДЛЯ ТЕСТА
 
                     reply = average + " " + reply;
 
@@ -225,8 +171,6 @@ namespace ServerWindow
                     handler.Send(msg);
                     // Отправляем ответ клиенту\
                     Console.Write("Среднее число сейчас: " + average + "\n\n");
-                    //byte[] msg = Encoding.UTF8.GetBytes(reply);
-                    //  handler.Send(msg);
 
                     if (data.IndexOf("<TheEnd>") > -1)
                     {
@@ -250,27 +194,23 @@ namespace ServerWindow
 
 
 
-
-
-
-        
         static async void WorkWithTGClietn()
         {
             await Task.Run(() => CheckList());
         }
         static void CheckList()
         {
-                var timeNow = DateTime.Now;
-                //var maxDifference = TimeSpan.FromMinutes(15);
-                var maxDifference = TimeSpan.FromSeconds(30);
+            var timeNow = DateTime.Now;
+            //var maxDifference = TimeSpan.FromMinutes(15);
+            var maxDifference = TimeSpan.FromSeconds(30);
 
-                for (var i = 0; i < _clientResponses.Count; i++)
+            for (var i = 0; i < _clientResponses.Count; i++)
+            {
+                if ((timeNow - _clientResponses[i].Time) > maxDifference)
                 {
-                    if ((timeNow - _clientResponses[i].Time) > maxDifference)
-                    {
-                                 _clientResponses.RemoveAt(i);
-                    }
+                    _clientResponses.RemoveAt(i);
                 }
-         }
+            }
+        }
     }
 }

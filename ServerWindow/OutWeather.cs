@@ -38,60 +38,8 @@ namespace ServerWindow
             OutputWeather.Date = DateTime.Now.ToString();
             string[] numbers = { OutputWeather.Temperature, OutputWeather.Pressure, OutputWeather.Temp_min, OutputWeather.Date };
 
-            //запись в базу
-            GetDBConnection();
-
-
-
             return OutputWeather.Temperature;
         }
-
-        public static SqlConnection
-        GetDBConnection()
-        {
-            //
-            // Data Source=TRAN-VMWARE\SQLEXPRESS;Initial Catalog=simplehr;Persist Security Info=True;User ID=sa;Password=12345
-            //
-            string datasource = @"PROGRAM";
-
-            string connString = @"Data Source=" + datasource + "; Initial Catalog=WeatherStory; User ID=sa ; Password=Fibertrade2";
-
-            SqlConnection connection = new SqlConnection(connString);
-            connection.Open();
-            //Console.WriteLine("Подключение открыто");
-            //Console.WriteLine("Свойства подключения:");
-            //Console.WriteLine("\tСтрока подключения: {0}", connection.ConnectionString);
-            //Console.WriteLine("\tБаза данных: {0}", connection.Database);
-            //Console.WriteLine("\tСервер: {0}", connection.DataSource);
-            //Console.WriteLine("\tВерсия сервера: {0}", connection.ServerVersion);
-            //Console.WriteLine("\tСостояние: {0}", connection.State);
-            //Console.WriteLine("\tWorkstationld: {0}", connection.WorkstationId);
-            var DBTemp = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Temperature)));
-            var DBPressure = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Pressure)));
-            var DBTempMin = Convert.ToString(Convert.ToInt32(Convert.ToDouble(OutputWeather.Temp_min)));
-            DateTime dt = DateTime.Now;
-            string DateNoFormat = dt.ToShortDateString();
-            string DateDB = DateNoFormat[0]+""+ DateNoFormat[1]+"-" + DateNoFormat[3] + "" + DateNoFormat[4] + "-" + DateNoFormat[6] + DateNoFormat[7] + DateNoFormat[8] + DateNoFormat[9];
-            //DateDB += " 00:00:10";
-            //DateDB = "22-12-2008 10:37:22";
-            //var cmd = new SqlCommand("SELECT City FROM Table_Weather WHERE Temp = -50", connection);20-10-2008 10:37:22'
-            //var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "', '20-10-2008 10:37:22','Novosibirsk')", connection);
-            var cmd = new SqlCommand("INSERT INTO SavedWeather VALUES('" + DBTemp + "','" + DBPressure + "', '" + DBTempMin + "','" + DateDB + "','Nsk')", connection);
-            SqlDataReader read = cmd.ExecuteReader();
-
-
-            if (read.HasRows) // если есть данные
-            {
-                while (read.Read())
-                {
-                    Console.WriteLine(read.GetName(0) + " " + Convert.ToString(read.GetSqlValue(0)));
-                }
-            }
-            return connection;
-        }
-
-
-
 
         class mainWeather
         {
